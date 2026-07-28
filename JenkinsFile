@@ -24,12 +24,12 @@ pipeline {
                     agent {
                         docker {
                             image 'node:22-alpine'
-                            reuseNode true
                         }
                     }
                     steps {
-                        // Unit tests with Vitest
-                        sh 'npx vitest run --reporter=verbose'
+                        // Ensure node_modules exist inside this container
+                        sh 'npm ci'
+                        sh 'npm run test:unit'
                     }
                 }
             }
