@@ -46,5 +46,26 @@ pipeline {
                 echo 'Mock deployment was successful!'
             }
         }
+        stage('e2e') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
+                    reuseNode true
+                }
+            }
+            environment {
+                // Set the base URL for the e2e tests
+                BASE_URL = 'https://spanish-cards.netlify.app/'
+            }
+            steps {
+                sh 'npx playwright test'
+            }
+            post{
+                always{
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, icon:'', keepAll: true, reportDir: 'reports-e2e/html/', reportFiles: 'index.html', reportName: 'Playwright Report',reportTitles: '', usewrapperfiledirectly: true])
+                    junit stdioRetention: 'ALL', testResults: 'reports-e2e/junit.xml'
+                }
+            }
+        }
     }
 }
